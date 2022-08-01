@@ -67,7 +67,7 @@ GLuint compile_shaders(void) {
     GLchar info_log[512];
     glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
     printf("%s\n", info_log);
-    return -1;
+    return (GLuint)(-1);
   }
   GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragment_shader, 1, &FRAGMENT_SHADER, NULL);
@@ -77,7 +77,7 @@ GLuint compile_shaders(void) {
     GLchar info_log[512];
     glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
     printf("%s\n", info_log);
-    return -1;
+    return (GLuint)(-1);
   }
   GLuint shader_program = glCreateProgram();
   glAttachShader(shader_program, vertex_shader);
@@ -88,7 +88,7 @@ GLuint compile_shaders(void) {
     GLchar info_log[512];
     glGetProgramInfoLog(shader_program, 512, NULL, info_log);
     printf("%s\n", info_log);
-    return -1;
+    return (GLuint)(-1);
   }
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
@@ -164,6 +164,11 @@ int main(void) {
       GL_ELEMENT_ARRAY_BUFFER, sizeof(ELEMENTS), ELEMENTS, GL_STATIC_DRAW);
 
   GLuint program = compile_shaders();
+  if (program == (GLuint)(-1)) {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 1;
+  }
 
   GLuint tex;
   glGenTextures(1, &tex);
