@@ -85,4 +85,5 @@ typedef struct {
   str* argv;
   bool dev_parm;
   str wad_files[MAX_WAD_FILES];
+  bool modified_game;
 } DoomState;

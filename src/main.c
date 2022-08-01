@@ -1,9 +1,12 @@
+#include "doom/doom.h"
+#include "doom/error.h"
 #include "doom/framerate.h"
 #include "doom/gl.h"
 #include "doom/iwad.h"
 #include "doom/key_cb.h"
 #include "doom/mouse_cb.h"
 #include "doom/movement.h"
+#include "doom/parm.h"
 #include "doom/print.h"
 #include "doom/render.h"
 #include "doom/resolution.h"
@@ -211,6 +214,88 @@ int main(int argc, char** argv) {
       print_centered(
           str_lit("Public DOOM - v" MAJOR_VERSION_STR "." MINOR_VERSION_STR),
           ' ');
+      break;
+  }
+
+  MaybeSize maybe_file_idx = parm_index(state, str_lit("-file"));
+  if (maybe_file_idx.is_present) {
+    state->modified_game = true;
+    for (size_t i = maybe_file_idx.value + 1;
+         i < state->argc && !str_has_prefix(state->argv[i], str_lit("-"));
+         ++i) {
+      doom_add_file(state, state->argv[i]);
+    }
+  }
+
+  if (state->modified_game) {
+    str names[] = {
+        str_lit("e2m1"),
+        str_lit("e2m2"),
+        str_lit("e2m3"),
+        str_lit("e2m4"),
+        str_lit("e2m5"),
+        str_lit("e2m6"),
+        str_lit("e2m7"),
+        str_lit("e2m8"),
+        str_lit("e2m9"),
+        str_lit("e3m1"),
+        str_lit("e3m2"),
+        str_lit("e3m3"),
+        str_lit("e3m4"),
+        str_lit("e3m5"),
+        str_lit("e3m6"),
+        str_lit("e3m7"),
+        str_lit("e3m8"),
+        str_lit("e3m9"),
+        str_lit("dphoof"),
+        str_lit("bfgga0"),
+        str_lit("heada1"),
+        str_lit("cybra1"),
+        str_lit("spida1d1"),
+    };
+
+    if (state->game_mode == GAME_MODE_SHAREWARE) {
+      doom_error("You cannot use -file with the shareware version. Register!");
+    }
+
+    if (state->game_mode == GAME_MODE_REGISTERED) {
+      for (size_t i = 0; i < sizeof(names) / sizeof(str); ++i) {
+        MaybeSize num = check_num_for_name(state, names[i]);
+        if (!num.is_present) {
+          doom_error("This is not the registered version.");
+        }
+      }
+    }
+
+    print_centered(str_null, '=');
+    print_centered(str_lit("ATTENTION: This version of DOOM has been modified. "
+                           "If you would like to"),
+        ' ');
+    print_centered(str_lit("get a copy of the original game, call "
+                           "1-800-IDGAMES or see the readme file."),
+        ' ');
+    print_centered(
+        str_lit("You will not receive technical support for modified games."),
+        ' ');
+    print_centered(str_null, '=');
+  }
+
+  switch (state->game_mode) {
+    case GAME_MODE_SHAREWARE:
+    case GAME_MODE_UNDETERMINED:
+      print_centered(str_null, '=');
+      print_centered(str_lit("Shareware!"), ' ');
+      print_centered(str_null, '=');
+      break;
+    case GAME_MODE_REGISTERED:
+    case GAME_MODE_RETAIL:
+    case GAME_MODE_COMMERCIAL:
+      print_centered(str_null, '=');
+      print_centered(str_lit("Commercial product - do not distribute!"), ' ');
+      print_centered(
+          str_lit("Please report software piracy to the SPA: 1-800-388-PIR8"),
+          ' ');
+      print_centered(str_null, '=');
       break;
   }
 
