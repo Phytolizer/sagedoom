@@ -1,5 +1,8 @@
 #pragma once
 
+#include "doom/intermission_state.h"
+#include "doom/wad_types.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -56,6 +59,12 @@ typedef enum {
 } DoomGameState;
 
 typedef struct {
+  void** lump_cache;
+  DoomLumpInfo* lump_info;
+  size_t num_lumps;
+} DoomWadState;
+
+typedef struct {
   DoomKeys keys;
   DoomMouse mouse;
   DoomPlayer player;
@@ -63,4 +72,6 @@ typedef struct {
   DoomGameState game_state;
   bool automap_active;
   size_t game_tic;
+  DoomIntermissionState intermission_state;
+  DoomWadState wad;
 } DoomState;

@@ -166,12 +166,12 @@ int main(void) {
     return 1;
   }
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  DoomState state = {0};
-  state.player.x = 70;
-  state.player.y = -110;
-  state.player.z = 20;
-  state.player.ang = 0;
-  glfwSetWindowUserPointer(window, &state);
+  DoomState* state = calloc(1, sizeof(DoomState));
+  state->player.x = 70;
+  state->player.y = -110;
+  state->player.z = 20;
+  state->player.ang = 0;
+  glfwSetWindowUserPointer(window, state);
   glfwSetKeyCallback(window, key_cb);
   glfwSetCursorPosCallback(window, mouse_cb);
   glfwMakeContextCurrent(window);
@@ -225,9 +225,9 @@ int main(void) {
   for (DoomFrameBufferId id = DOOM_FRAME_BUFFER_ID_PRIMARY;
        id < DOOM_FRAME_BUFFER_IDS_COUNT;
        ++id) {
-    state.frame_buffer.screens[id] =
+    state->frame_buffer.screens[id] =
         calloc(DOOM_WIDTH * DOOM_HEIGHT, sizeof(float) * 3);
-    if (state.frame_buffer.screens[id] == NULL) {
+    if (state->frame_buffer.screens[id] == NULL) {
       glfwDestroyWindow(window);
       glfwTerminate();
       return 1;
@@ -241,9 +241,9 @@ int main(void) {
     double delta = now - last_frame;
     if (delta >= DOOM_FRAME_TIME) {
       glfwPollEvents();
-      handle_movement(&state);
-      render_frame(&state);
-      show_pixels(state.frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY]);
+      handle_movement(state);
+      render_frame(state);
+      show_pixels(state->frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY]);
       glfwSwapBuffers(window);
 
       last_frame = now;
@@ -258,8 +258,9 @@ int main(void) {
   for (DoomFrameBufferId id = DOOM_FRAME_BUFFER_ID_PRIMARY;
        id < DOOM_FRAME_BUFFER_IDS_COUNT;
        ++id) {
-    free(state.frame_buffer.screens[id]);
+    free(state->frame_buffer.screens[id]);
   }
+  free(state);
   glfwDestroyWindow(window);
   glfwTerminate();
 }

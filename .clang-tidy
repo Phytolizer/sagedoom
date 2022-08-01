@@ -8,7 +8,6 @@ Checks: |
   bugprone-*,
   -bugprone-macro-parentheses,
   -bugprone-sizeof-expression,
-  concurrency-*,
   misc-*,
   portability-*,
   openmp-*,
