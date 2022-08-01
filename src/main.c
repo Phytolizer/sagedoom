@@ -115,7 +115,20 @@ void set_pixel(float* pixels, size_t x, size_t y, float r, float g, float b) {
   pixels[index + 2] = b;
 }
 
-void show_pixels(float* pixel_buffer) {
+void render_frame(float* pixel_buffer) {
+  for (size_t i = 0; i < DOOM_WINDOW_HEIGHT; i++) {
+    for (size_t j = 0; j < DOOM_WINDOW_WIDTH; j++) {
+      set_pixel(pixel_buffer,
+          j,
+          i,
+          (float)j / DOOM_WINDOW_WIDTH,
+          (float)i / DOOM_WINDOW_HEIGHT,
+          0.0F);
+    }
+  }
+}
+
+void show_pixels(const float* pixel_buffer) {
   glTexImage2D(GL_TEXTURE_2D,
       0,
       GL_RGB,
@@ -217,16 +230,7 @@ int main(void) {
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
-    for (size_t i = 0; i < DOOM_WINDOW_HEIGHT; i++) {
-      for (size_t j = 0; j < DOOM_WINDOW_WIDTH; j++) {
-        set_pixel(pixel_buffer,
-            j,
-            i,
-            (float)j / DOOM_WINDOW_WIDTH,
-            (float)i / DOOM_WINDOW_HEIGHT,
-            0.0F);
-      }
-    }
+    render_frame(pixel_buffer);
     show_pixels(pixel_buffer);
     glfwSwapBuffers(window);
   }
