@@ -5,18 +5,22 @@
 #include <stdlib.h>
 
 static const float VERTICES[] = {
+    // TL
     -0.5F,
     0.5F,
     0.0F,
     0.0F,
+    // TR
     0.5F,
     0.5F,
     1.0F,
     0.0F,
+    // BL
     0.5F,
     -0.5F,
     1.0F,
     1.0F,
+    // BR
     -0.5F,
     -0.5F,
     0.0F,
