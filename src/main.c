@@ -4,6 +4,7 @@
 #include "doom/key_cb.h"
 #include "doom/mouse_cb.h"
 #include "doom/movement.h"
+#include "doom/print.h"
 #include "doom/render.h"
 #include "doom/resolution.h"
 #include "doom/state.h"
@@ -183,6 +184,25 @@ int main(int argc, char** argv) {
   state->player.ang = 0;
 
   identify_version(state);
+
+  switch (state->game_mode) {
+    case GAME_MODE_RETAIL:
+      print_centered(str_lit("The Ultimate DOOM Startup v1.1"), ' ');
+      break;
+    case GAME_MODE_SHAREWARE:
+      print_centered(str_lit("DOOM Shareware Startup v1.1"), ' ');
+      break;
+    case GAME_MODE_REGISTERED:
+      print_centered(str_lit("DOOM Registered Startup v1.1"), ' ');
+      break;
+    case GAME_MODE_COMMERCIAL:
+      print_centered(str_lit("DOOM 2: Hell on Earth v1.1"), ' ');
+      break;
+    default:
+      print_centered(str_lit("Public DOOM - v1.1"), ' ');
+      break;
+  }
+
   zone_init(state);
   wad_init_multiple_files(state);
 
