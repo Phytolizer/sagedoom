@@ -8,6 +8,7 @@
 #include "doom/render.h"
 #include "doom/resolution.h"
 #include "doom/state.h"
+#include "doom/version.h"
 #include "doom/wad.h"
 
 #include <stdio.h>
@@ -187,19 +188,29 @@ int main(int argc, char** argv) {
 
   switch (state->game_mode) {
     case GAME_MODE_RETAIL:
-      print_centered(str_lit("The Ultimate DOOM Startup v1.1"), ' ');
+      print_centered(str_lit("The Ultimate DOOM Startup v" MAJOR_VERSION_STR
+                             "." MINOR_VERSION_STR),
+          ' ');
       break;
     case GAME_MODE_SHAREWARE:
-      print_centered(str_lit("DOOM Shareware Startup v1.1"), ' ');
+      print_centered(str_lit("DOOM Shareware Startup v" MAJOR_VERSION_STR
+                             "." MINOR_VERSION_STR),
+          ' ');
       break;
     case GAME_MODE_REGISTERED:
-      print_centered(str_lit("DOOM Registered Startup v1.1"), ' ');
+      print_centered(str_lit("DOOM Registered Startup v" MAJOR_VERSION_STR
+                             "." MINOR_VERSION_STR),
+          ' ');
       break;
     case GAME_MODE_COMMERCIAL:
-      print_centered(str_lit("DOOM 2: Hell on Earth v1.1"), ' ');
+      print_centered(str_lit("DOOM 2: Hell on Earth v" MAJOR_VERSION_STR
+                             "." MINOR_VERSION_STR),
+          ' ');
       break;
     default:
-      print_centered(str_lit("Public DOOM - v1.1"), ' ');
+      print_centered(
+          str_lit("Public DOOM - v" MAJOR_VERSION_STR "." MINOR_VERSION_STR),
+          ' ');
       break;
   }
 
