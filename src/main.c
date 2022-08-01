@@ -1,5 +1,8 @@
 #include "doom/gl.h"
+#include "doom/key_cb.h"
+#include "doom/mouse_cb.h"
 #include "doom/resolution.h"
+#include "doom/state.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -172,6 +175,11 @@ int main(void) {
     glfwTerminate();
     return 1;
   }
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  DoomState state;
+  glfwSetWindowUserPointer(window, &state);
+  glfwSetKeyCallback(window, key_cb);
+  glfwSetCursorPosCallback(window, mouse_cb);
   glfwMakeContextCurrent(window);
   if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GL_FALSE) {
     glfwDestroyWindow(window);
