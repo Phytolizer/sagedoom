@@ -234,11 +234,16 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
-  float* pixel_buffer = calloc(DOOM_WIDTH * DOOM_HEIGHT, sizeof(float) * 3);
-  if (pixel_buffer == NULL) {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 1;
+  for (DoomFrameBufferId id = DOOM_FRAME_BUFFER_ID_PRIMARY;
+       id < DOOM_FRAME_BUFFER_IDS_COUNT;
+       ++id) {
+    state.frame_buffer.screens[id] =
+        calloc(DOOM_WIDTH * DOOM_HEIGHT, sizeof(float) * 3);
+    if (state.frame_buffer.screens[id] == NULL) {
+      glfwDestroyWindow(window);
+      glfwTerminate();
+      return 1;
+    }
   }
 
   double last_frame = glfwGetTime();
@@ -249,8 +254,8 @@ int main(void) {
     if (delta >= DOOM_FRAME_TIME) {
       glfwPollEvents();
       handle_movement(&state);
-      render_frame(pixel_buffer);
-      show_pixels(pixel_buffer);
+      render_frame(state.frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY]);
+      show_pixels(state.frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY]);
       glfwSwapBuffers(window);
 
       last_frame = now;
@@ -262,7 +267,11 @@ int main(void) {
   glDeleteBuffers(1, &ebo);
   glDeleteVertexArrays(1, &vao);
 
-  free(pixel_buffer);
+  for (DoomFrameBufferId id = DOOM_FRAME_BUFFER_ID_PRIMARY;
+       id < DOOM_FRAME_BUFFER_IDS_COUNT;
+       ++id) {
+    free(state.frame_buffer.screens[id]);
+  }
   glfwDestroyWindow(window);
   glfwTerminate();
 }
