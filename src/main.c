@@ -60,6 +60,8 @@ static const char* const FRAGMENT_SHADER =
     "    color = texture(tex, texcoord);\n"
     "}";
 
+static const double FPS_LIMIT = 1.0 / 60.0;
+
 GLuint compile_shaders(void) {
   GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &VERTEX_SHADER, NULL);
@@ -236,11 +238,19 @@ int main(void) {
     return 1;
   }
 
+  double last_frame = glfwGetTime();
+
   while (!glfwWindowShouldClose(window)) {
-    glfwPollEvents();
-    render_frame(pixel_buffer);
-    show_pixels(pixel_buffer);
-    glfwSwapBuffers(window);
+    double now = glfwGetTime();
+    double delta = now - last_frame;
+    if (delta >= FPS_LIMIT) {
+      glfwPollEvents();
+      render_frame(pixel_buffer);
+      show_pixels(pixel_buffer);
+      glfwSwapBuffers(window);
+
+      last_frame = now;
+    }
   }
 
   glDeleteProgram(program);
