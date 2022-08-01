@@ -6,23 +6,23 @@
 
 static const float VERTICES[] = {
     // TL
-    -0.5F,
-    0.5F,
+    -1.0F,
+    1.0F,
     0.0F,
     0.0F,
     // TR
-    0.5F,
-    0.5F,
+    1.0F,
+    1.0F,
     1.0F,
     0.0F,
     // BL
-    0.5F,
-    -0.5F,
+    1.0F,
+    -1.0F,
     1.0F,
     1.0F,
     // BR
-    -0.5F,
-    -0.5F,
+    -1.0F,
+    -1.0F,
     0.0F,
     1.0F,
 };
@@ -104,6 +104,7 @@ GLuint compile_shaders(void) {
       GL_FALSE,
       4 * sizeof(float),
       (void*)(2 * sizeof(float)));
+  glUseProgram(shader_program);
   return shader_program;
 }
 
@@ -127,6 +128,22 @@ void show_pixels(float* pixel_buffer) {
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+void APIENTRY gl_debug_callback(GLenum source,
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar* message,
+    const void* user_param) {
+  (void)source;
+  (void)type;
+  (void)id;
+  (void)severity;
+  (void)length;
+  (void)user_param;
+  printf("%s\n", message);
+}
+
 int main(void) {
   if (glfwInit() == GLFW_FALSE) {
     return 1;
@@ -135,6 +152,7 @@ int main(void) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
   GLFWwindow* window = glfwCreateWindow(
       DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT, "Doom", NULL, NULL);
   if (window == NULL) {
@@ -146,6 +164,16 @@ int main(void) {
     glfwDestroyWindow(window);
     glfwTerminate();
     return 1;
+  }
+
+  GLint flags;
+  glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+  if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(gl_debug_callback, NULL);
+    glDebugMessageControl(
+        GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
   }
 
   GLuint vao;
@@ -177,7 +205,6 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glGenerateMipmap(GL_TEXTURE_2D);
   glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
   float* pixel_buffer =
