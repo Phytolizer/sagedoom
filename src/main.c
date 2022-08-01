@@ -120,10 +120,10 @@ void set_pixel(float* pixels, size_t x, size_t y, float r, float g, float b) {
   pixels[index + 2] = b;
 }
 
-void render_frame(float* pixel_buffer) {
+void render_frame(DoomState* state) {
   for (size_t i = 0; i < DOOM_HEIGHT; i++) {
     for (size_t j = 0; j < DOOM_WIDTH; j++) {
-      set_pixel(pixel_buffer,
+      set_pixel(state->frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY],
           j,
           i,
           (float)j / DOOM_WIDTH,
@@ -254,7 +254,7 @@ int main(void) {
     if (delta >= DOOM_FRAME_TIME) {
       glfwPollEvents();
       handle_movement(&state);
-      render_frame(state.frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY]);
+      render_frame(&state);
       show_pixels(state.frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY]);
       glfwSwapBuffers(window);
 
