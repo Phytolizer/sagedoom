@@ -114,20 +114,20 @@ GLuint compile_shaders(void) {
 }
 
 void set_pixel(float* pixels, size_t x, size_t y, float r, float g, float b) {
-  size_t index = (x + y * DOOM_WINDOW_WIDTH) * 3;
+  size_t index = (x + y * DOOM_WIDTH) * 3;
   pixels[index] = r;
   pixels[index + 1] = g;
   pixels[index + 2] = b;
 }
 
 void render_frame(float* pixel_buffer) {
-  for (size_t i = 0; i < DOOM_WINDOW_HEIGHT; i++) {
-    for (size_t j = 0; j < DOOM_WINDOW_WIDTH; j++) {
+  for (size_t i = 0; i < DOOM_HEIGHT; i++) {
+    for (size_t j = 0; j < DOOM_WIDTH; j++) {
       set_pixel(pixel_buffer,
           j,
           i,
-          (float)j / DOOM_WINDOW_WIDTH,
-          (float)i / DOOM_WINDOW_HEIGHT,
+          (float)j / DOOM_WIDTH,
+          (float)i / DOOM_HEIGHT,
           0.0F);
     }
   }
@@ -137,8 +137,8 @@ void show_pixels(const float* pixel_buffer) {
   glTexImage2D(GL_TEXTURE_2D,
       0,
       GL_RGB,
-      DOOM_WINDOW_WIDTH,
-      DOOM_WINDOW_HEIGHT,
+      DOOM_WIDTH,
+      DOOM_HEIGHT,
       0,
       GL_RGB,
       GL_FLOAT,
@@ -230,8 +230,7 @@ int main(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
-  float* pixel_buffer =
-      calloc(DOOM_WINDOW_WIDTH * DOOM_WINDOW_HEIGHT, sizeof(float) * 3);
+  float* pixel_buffer = calloc(DOOM_WIDTH * DOOM_HEIGHT, sizeof(float) * 3);
   if (pixel_buffer == NULL) {
     glfwDestroyWindow(window);
     glfwTerminate();
