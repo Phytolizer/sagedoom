@@ -3,6 +3,7 @@
 #include "doom/key_cb.h"
 #include "doom/mouse_cb.h"
 #include "doom/movement.h"
+#include "doom/render.h"
 #include "doom/resolution.h"
 #include "doom/state.h"
 
@@ -118,19 +119,6 @@ void set_pixel(float* pixels, size_t x, size_t y, float r, float g, float b) {
   pixels[index] = r;
   pixels[index + 1] = g;
   pixels[index + 2] = b;
-}
-
-void render_frame(DoomState* state) {
-  for (size_t i = 0; i < DOOM_HEIGHT; i++) {
-    for (size_t j = 0; j < DOOM_WIDTH; j++) {
-      set_pixel(state->frame_buffer.screens[DOOM_FRAME_BUFFER_ID_PRIMARY],
-          j,
-          i,
-          (float)j / DOOM_WIDTH,
-          (float)i / DOOM_HEIGHT,
-          0.0F);
-    }
-  }
 }
 
 void show_pixels(const float* pixel_buffer) {

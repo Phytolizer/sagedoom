@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct {
   bool w;
@@ -41,9 +42,25 @@ typedef struct {
   float* screens[DOOM_FRAME_BUFFER_IDS_COUNT];
 } DoomFrameBuffer;
 
+#define DOOM_GAME_STATES_X \
+  X(LEVEL) \
+  X(INTERMISSION) \
+  X(FINALE) \
+  X(DEMOSCREEN) \
+  X(WIPE)
+
+typedef enum {
+#define X(x) DOOM_GAME_STATE_##x,
+  DOOM_GAME_STATES_X
+#undef X
+} DoomGameState;
+
 typedef struct {
   DoomKeys keys;
   DoomMouse mouse;
   DoomPlayer player;
   DoomFrameBuffer frame_buffer;
+  DoomGameState game_state;
+  bool automap_active;
+  size_t game_tic;
 } DoomState;
