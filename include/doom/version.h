@@ -1,7 +1,8 @@
 #pragma once
 
 #define MAJOR_VERSION 1
-#define MINOR_VERSION 1
+#define MINOR_VERSION 10
+#define VERSION (MAJOR_VERSION * 100 + MINOR_VERSION)
 
 #define STRINGIZE_(x) #x
 #define STRINGIZE(x) STRINGIZE_(x)
