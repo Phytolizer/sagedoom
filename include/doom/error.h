@@ -1,3 +1,5 @@
 #pragma once
 
-void doom_error(const char* message);
+#include <stdnoreturn.h>
+
+noreturn void doom_error(const char* message, ...);

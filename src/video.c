@@ -2,6 +2,6 @@
 
 #include "doom/misc.h"
 
-void set_palette(DoomState* state, DoomByte* palette) {
+void set_palette(DoomState* state, Byte* palette) {
   TODO("Set palette");
 }

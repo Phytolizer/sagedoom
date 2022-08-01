@@ -2,6 +2,7 @@
 
 #include "doom/intermission_state.h"
 #include "doom/wad_types.h"
+#include "doom/zone_types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -74,4 +75,5 @@ typedef struct {
   size_t game_tic;
   DoomIntermissionState intermission_state;
   DoomWadState wad;
+  MemoryZone* main_zone;
 } DoomState;

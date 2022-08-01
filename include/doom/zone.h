@@ -1,19 +1,16 @@
 #pragma once
 
-#define DOOM_PURGE_TAGS_X \
-  /* not overwritten until freed */ \
-  X(STATIC = 1) \
-  X(SOUND = 2) \
-  X(MUSIC = 3) \
-  X(DAVE = 4) \
-  X(LEVEL = 50) \
-  X(LEVEL_SPECIAL = 51) \
-  /* purgable when needed */ \
-  X(PURGE_LEVEL = 100) \
-  X(CACHE = 101)
+#include "doom/state.h"
+#include "doom/zone_types.h"
 
-typedef enum {
-#define X(x) DOOM_PURGE_TAG_##x,
-  DOOM_PURGE_TAGS_X
-#undef X
-} DoomPurgeTag;
+void zone_init(DoomState* state);
+void* zone_malloc(DoomState* state, size_t size, DoomPurgeTag tag, void* user);
+void zone_free(DoomState* state, void* ptr);
+void zone_free_tags(
+    DoomState* state, DoomPurgeTag low_tag, DoomPurgeTag high_tag);
+void zone_dump_heap(
+    DoomState* state, DoomPurgeTag low_tag, DoomPurgeTag high_tag);
+void zone_file_dump_heap(DoomState* state, FILE* fp);
+void zone_check_heap(DoomState* state);
+void zone_change_tag(void* ptr, DoomPurgeTag tag);
+size_t zone_free_memory(DoomState* state);

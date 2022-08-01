@@ -2,4 +2,4 @@
 
 #include <stdint.h>
 
-typedef uint8_t DoomByte;
+typedef uint8_t Byte;

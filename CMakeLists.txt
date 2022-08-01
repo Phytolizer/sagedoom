@@ -21,6 +21,7 @@ add_executable(
   src/wad.c
   src/error.c
   src/file_util.c
+  src/zone.c
 )
 target_include_directories(sagedoom PRIVATE include)
 target_link_libraries(sagedoom PRIVATE glad::glad str::str glfw m)
