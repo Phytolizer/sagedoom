@@ -7,9 +7,7 @@
 
 #include <str.h>
 
-typedef MAYBE_T(size_t) MaybeSize;
-
-void wad_init_multiple_files(DoomState* state, const str* filenames);
+void wad_init_multiple_files(DoomState* state);
 void* cache_lump_num(DoomState* state, size_t lump, DoomPurgeTag tag);
 void* cache_lump_name(DoomState* state, str name, DoomPurgeTag tag);
 MaybeSize check_num_for_name(DoomState* state, str name);

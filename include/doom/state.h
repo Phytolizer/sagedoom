@@ -1,11 +1,13 @@
 #pragma once
 
+#include "doom/game_mode.h"
 #include "doom/intermission_state.h"
 #include "doom/wad_types.h"
 #include "doom/zone_types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <str.h>
 
 typedef struct {
   bool w;
@@ -65,6 +67,8 @@ typedef struct {
   size_t num_lumps;
 } DoomWadState;
 
+enum { MAX_WAD_FILES = 20 };
+
 typedef struct {
   DoomKeys keys;
   DoomMouse mouse;
@@ -76,4 +80,9 @@ typedef struct {
   DoomIntermissionState intermission_state;
   DoomWadState wad;
   MemoryZone* main_zone;
+  GameMode game_mode;
+  size_t argc;
+  str* argv;
+  bool dev_parm;
+  str wad_files[MAX_WAD_FILES];
 } DoomState;

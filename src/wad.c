@@ -15,12 +15,13 @@
 static void l_add_file(DoomState* state, str filename);
 static void l_extract_file_base(str filename, char* dest);
 
-void wad_init_multiple_files(DoomState* state, const str* filenames) {
+void wad_init_multiple_files(DoomState* state) {
   state->wad.num_lumps = 0;
   state->wad.lump_info = NULL;
 
-  for (size_t i = 0; !str_is_empty(filenames[i]); i++) {
-    l_add_file(state, filenames[i]);
+  for (size_t i = 0; i < MAX_WAD_FILES && !str_is_empty(state->wad_files[i]);
+       i++) {
+    l_add_file(state, state->wad_files[i]);
   }
 
   if (state->wad.num_lumps == 0) {

@@ -41,7 +41,7 @@ void* zone_malloc(DoomState* state, size_t size, DoomPurgeTag tag, void* user) {
     }
 
     if (!IS_MARKED_FREE(rover)) {
-      if (rover->tag < DOOM_PURGE_TAG_PURGE_LEVEL) {
+      if (rover->tag < PURGE_TAG_PURGE_LEVEL) {
         base = rover->next;
         rover = rover->next;
       } else {
@@ -74,7 +74,7 @@ void* zone_malloc(DoomState* state, size_t size, DoomPurgeTag tag, void* user) {
     base->user = user;
     *(void**)user = ((Byte*)base + sizeof(MemoryBlock));
   } else {
-    if (tag >= DOOM_PURGE_TAG_PURGE_LEVEL) {
+    if (tag >= PURGE_TAG_PURGE_LEVEL) {
       doom_error("zone_malloc: An owner is required for purgable blocks");
     }
 
@@ -240,7 +240,7 @@ void zone_change_tag(void* ptr, DoomPurgeTag tag) {
                "zone_malloc");
   }
 
-  if (tag >= DOOM_PURGE_TAG_PURGE_LEVEL && (size_t)block->user < 0x100) {
+  if (tag >= PURGE_TAG_PURGE_LEVEL && (size_t)block->user < 0x100) {
     doom_error("zone_change_tag: An owner is required for purgable blocks");
   }
 
@@ -252,7 +252,7 @@ size_t zone_free_memory(DoomState* state) {
   for (MemoryBlock* block = state->main_zone->block_list.next;
        block != &state->main_zone->block_list;
        block = block->next) {
-    if (IS_MARKED_FREE(block) || block->tag >= DOOM_PURGE_TAG_PURGE_LEVEL) {
+    if (IS_MARKED_FREE(block) || block->tag >= PURGE_TAG_PURGE_LEVEL) {
       free_amt += block->size;
     }
   }
@@ -265,7 +265,7 @@ static void l_clear_zone(MemoryZone* zone) {
   zone->block_list.prev = free_block;
 
   zone->block_list.user = (void**)zone;
-  zone->block_list.tag = DOOM_PURGE_TAG_STATIC;
+  zone->block_list.tag = PURGE_TAG_STATIC;
   zone->rover = free_block;
 
   free_block->next = &zone->block_list;

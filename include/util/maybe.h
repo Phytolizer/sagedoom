@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #define MAYBE_T(T) \
   struct { \
@@ -17,3 +18,5 @@
   (M) { \
     .is_present = true, .value = (V) \
   }
+
+typedef MAYBE_T(size_t) MaybeSize;

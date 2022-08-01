@@ -1,11 +1,13 @@
 #include "doom/framerate.h"
 #include "doom/gl.h"
+#include "doom/iwad.h"
 #include "doom/key_cb.h"
 #include "doom/mouse_cb.h"
 #include "doom/movement.h"
 #include "doom/render.h"
 #include "doom/resolution.h"
 #include "doom/state.h"
+#include "doom/wad.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -150,7 +152,7 @@ void APIENTRY gl_debug_callback(GLenum source,
   printf("%s\n", message);
 }
 
-int main(void) {
+int main(int argc, char** argv) {
   if (glfwInit() == GLFW_FALSE) {
     return 1;
   }
@@ -167,10 +169,23 @@ int main(void) {
   }
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   DoomState* state = calloc(1, sizeof(DoomState));
+  state->argc = argc;
+  state->argv = calloc(argc, sizeof(str));
+  for (size_t i = 0; i < state->argc; ++i) {
+    state->argv[i] = str_ref(argv[i]);
+  }
+  for (size_t i = 0; i < MAX_WAD_FILES; ++i) {
+    state->wad_files[i] = str_null;
+  }
   state->player.x = 70;
   state->player.y = -110;
   state->player.z = 20;
   state->player.ang = 0;
+
+  identify_version(state);
+  zone_init(state);
+  wad_init_multiple_files(state);
+
   glfwSetWindowUserPointer(window, state);
   glfwSetKeyCallback(window, key_cb);
   glfwSetCursorPosCallback(window, mouse_cb);

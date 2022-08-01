@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#define DOOM_PURGE_TAGS_X \
+#define PURGE_TAGS_X \
   /* not overwritten until freed */ \
   X(STATIC = 1) \
   X(SOUND = 2) \
@@ -15,8 +15,8 @@
   X(CACHE = 101)
 
 typedef enum {
-#define X(x) DOOM_PURGE_TAG_##x,
-  DOOM_PURGE_TAGS_X
+#define X(x) PURGE_TAG_##x,
+  PURGE_TAGS_X
 #undef X
 } DoomPurgeTag;
 

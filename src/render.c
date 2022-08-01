@@ -43,7 +43,7 @@ void render_frame(DoomState* state) {
   l_render_hud(state);
 
   set_palette(
-      state, cache_lump_name(state, str_lit("PLAYPAL"), DOOM_PURGE_TAG_CACHE));
+      state, cache_lump_name(state, str_lit("PLAYPAL"), PURGE_TAG_CACHE));
 
   l_render_menu(state);
 }
