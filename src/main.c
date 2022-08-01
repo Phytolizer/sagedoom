@@ -270,6 +270,8 @@ int main(int argc, char** argv) {
   glDeleteBuffers(1, &ebo);
   glDeleteVertexArrays(1, &vao);
 
+  zone_file_dump_heap(state, stdout);
+
   for (DoomFrameBufferId id = DOOM_FRAME_BUFFER_ID_PRIMARY;
        id < DOOM_FRAME_BUFFER_IDS_COUNT;
        ++id) {

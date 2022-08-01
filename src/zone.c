@@ -156,7 +156,7 @@ void zone_dump_heap(
   for (MemoryBlock* block = state->main_zone->block_list.next;;
        block = block->next) {
     if (block->tag >= low_tag && block->tag <= high_tag) {
-      printf("block: %p    size: %7zu    user: %p    tag: %3d\n",
+      printf("block: %14p    size: %7zu    user: %14p    tag: %3d\n",
           (void*)block,
           block->size,
           (void*)block->user,
@@ -190,7 +190,7 @@ void zone_file_dump_heap(DoomState* state, FILE* fp) {
   for (MemoryBlock* block = state->main_zone->block_list.next;;
        block = block->next) {
     (void)fprintf(fp,
-        "block: %p    size: %7zu    user: %p    tag: %3d\n",
+        "block: %14p    size: %7zu    user: %14p    tag: %3d\n",
         (void*)block,
         block->size,
         (void*)block->user,
