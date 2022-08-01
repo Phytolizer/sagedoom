@@ -17,6 +17,14 @@ typedef struct {
 } DoomMouse;
 
 typedef struct {
+  double x;
+  double y;
+  double z;
+  double ang;
+} DoomPlayer;
+
+typedef struct {
   DoomKeys keys;
   DoomMouse mouse;
+  DoomPlayer player;
 } DoomState;

@@ -1,6 +1,8 @@
+#include "doom/framerate.h"
 #include "doom/gl.h"
 #include "doom/key_cb.h"
 #include "doom/mouse_cb.h"
+#include "doom/movement.h"
 #include "doom/resolution.h"
 #include "doom/state.h"
 
@@ -59,8 +61,6 @@ static const char* const FRAGMENT_SHADER =
     "void main() {\n"
     "    color = texture(tex, texcoord);\n"
     "}";
-
-static const double FPS_LIMIT = 1.0 / 60.0;
 
 GLuint compile_shaders(void) {
   GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -178,7 +178,11 @@ int main(void) {
     return 1;
   }
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  DoomState state;
+  DoomState state = {0};
+  state.player.x = 70;
+  state.player.y = -110;
+  state.player.z = 20;
+  state.player.ang = 0;
   glfwSetWindowUserPointer(window, &state);
   glfwSetKeyCallback(window, key_cb);
   glfwSetCursorPosCallback(window, mouse_cb);
@@ -242,8 +246,9 @@ int main(void) {
   while (!glfwWindowShouldClose(window)) {
     double now = glfwGetTime();
     double delta = now - last_frame;
-    if (delta >= FPS_LIMIT) {
+    if (delta >= DOOM_FRAME_TIME) {
       glfwPollEvents();
+      handle_movement(&state);
       render_frame(pixel_buffer);
       show_pixels(pixel_buffer);
       glfwSwapBuffers(window);
