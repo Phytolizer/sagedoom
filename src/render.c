@@ -15,27 +15,27 @@ static void l_render_menu(DoomState* state);
 
 void render_frame(DoomState* state) {
   switch (state->game_state) {
-    case DOOM_GAME_STATE_LEVEL:
+    case GAME_STATE_LEVEL:
       if (state->automap_active) {
         l_render_automap(state);
       }
       l_render_stbar(state);
       break;
-    case DOOM_GAME_STATE_INTERMISSION:
+    case GAME_STATE_INTERMISSION:
       render_intermission(state);
       break;
-    case DOOM_GAME_STATE_FINALE:
+    case GAME_STATE_FINALE:
       l_render_finale(state);
       break;
-    case DOOM_GAME_STATE_DEMOSCREEN:
+    case GAME_STATE_DEMOSCREEN:
       l_render_demoscreen(state);
       break;
-    case DOOM_GAME_STATE_WIPE:
+    case GAME_STATE_WIPE:
       // handled elsewhere
       break;
   }
 
-  if (state->game_state == DOOM_GAME_STATE_LEVEL && !state->automap_active &&
+  if (state->game_state == GAME_STATE_LEVEL && !state->automap_active &&
       state->game_tic != 0) {
     l_render_player_view(state);
   }
