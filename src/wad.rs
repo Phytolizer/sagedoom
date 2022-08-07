@@ -46,8 +46,8 @@ impl State {
     }
 }
 
-pub(crate) fn init(state: &mut crate::state::State, filenames: Vec<PathBuf>) {
-    for filename in filenames.iter() {
+pub(crate) fn init(state: &mut crate::state::State, filenames: impl AsRef<[PathBuf]>) {
+    for filename in filenames.as_ref().iter() {
         add_file(state, filename);
     }
 
