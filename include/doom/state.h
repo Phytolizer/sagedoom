@@ -2,6 +2,7 @@
 
 #include "doom/game_mode.h"
 #include "doom/intermission_state.h"
+#include "doom/statusbar/types.h"
 #include "doom/wad_types.h"
 #include "doom/zone_types.h"
 
@@ -67,6 +68,17 @@ typedef struct {
   size_t num_lumps;
 } DoomWadState;
 
+typedef struct {
+  StatusNumberWidget ready_weapon;
+} StatusWidgets;
+
+typedef struct {
+  bool first_time;
+  bool status_bar_on;
+  bool arms_on;
+  StatusWidgets widgets;
+} StatusBarState;
+
 enum { MAX_WAD_FILES = 20 };
 
 typedef struct {
@@ -86,4 +98,5 @@ typedef struct {
   bool dev_parm;
   str wad_files[MAX_WAD_FILES];
   bool modified_game;
+  StatusBarState stbar;
 } DoomState;

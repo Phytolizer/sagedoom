@@ -26,6 +26,7 @@ add_executable(
   src/parm.c
   src/doom.c
   src/print.c
+  src/statusbar/lib.c
 )
 target_include_directories(sagedoom PRIVATE include)
 target_link_libraries(sagedoom PRIVATE glad::glad str::str glfw m)

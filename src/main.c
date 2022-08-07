@@ -299,6 +299,9 @@ int main(int argc, char** argv) {
       break;
   }
 
+  state->stbar.first_time = true;
+  state->stbar.status_bar_on = true;
+
   zone_init(state);
   wad_init_multiple_files(state);
 
