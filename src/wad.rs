@@ -67,7 +67,7 @@ fn add_file(state: &mut crate::state::State, filename: impl AsRef<Path>) {
             return;
         }
     };
-    println!("adding {}", filename.display());
+    println!(" adding {}", filename.display());
     let start_lump = state.wad.num_lumps;
     let file_info = if filename
         .extension()

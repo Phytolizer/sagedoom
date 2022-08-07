@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 byteorder = "1.4.3"
+crossterm = "0.24.0"
