@@ -94,9 +94,11 @@ fn add_file(state: &mut crate::state::State, filename: impl AsRef<Path>) {
         let num_lumps = header.num_lumps.try_into().unwrap();
         let mut file_info = Vec::new();
         file_info.reserve(num_lumps);
-        handle.seek(SeekFrom::Start(
-            header.info_table_offset.try_into().unwrap(),
-        ));
+        handle
+            .seek(SeekFrom::Start(
+                header.info_table_offset.try_into().unwrap(),
+            ))
+            .unwrap();
         for _ in 0..(header.num_lumps) {
             let file_pos = handle.read_i32::<LittleEndian>().unwrap();
             let size = handle.read_i32::<LittleEndian>().unwrap();
