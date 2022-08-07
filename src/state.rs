@@ -25,7 +25,7 @@ impl State {
             wad: crate::wad::State::new(),
             game_mode: GameMode::Undetermined,
             wad_files: Vec::new(),
-            terminal_size: terminal::size().unwrap(),
+            terminal_size: terminal::size().unwrap_or((1, 1)),
         }
     }
 }
