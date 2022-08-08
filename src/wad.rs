@@ -1,5 +1,6 @@
 use byteorder::LittleEndian;
 use byteorder::ReadBytesExt;
+use std::cell::RefCell;
 use std::fs::File;
 use std::io::Read;
 use std::io::Seek;
@@ -23,7 +24,7 @@ pub(crate) struct FileLump {
 #[derive(Debug, Clone)]
 pub(crate) struct LumpInfo {
     pub(crate) name: String,
-    pub(crate) handle: Rc<File>,
+    pub(crate) handle: Rc<RefCell<File>>,
     pub(crate) position: usize,
     pub(crate) size: usize,
 }
@@ -129,7 +130,7 @@ fn add_file(state: &mut State, filename: impl AsRef<Path>) {
     state.lump_info.extend(
         std::iter::repeat(LumpInfo {
             name: String::new(),
-            handle: Rc::new(handle),
+            handle: Rc::new(RefCell::new(handle)),
             position: 0,
             size: 0,
         })
@@ -156,4 +157,40 @@ pub(crate) fn check_num_for_name(state: &State, name: impl AsRef<str>) -> Option
         }
     }
     None
+}
+
+pub(crate) fn get_num_for_name(state: &State, name: impl AsRef<str>) -> usize {
+    let name = name.as_ref();
+    check_num_for_name(state, name).unwrap_or_else(|| panic!("{name} not found!"))
+}
+
+pub(crate) fn lump_length(state: &State, num: usize) -> usize {
+    if num >= state.num_lumps {
+        panic!("lump {num} >= num_lumps");
+    }
+    state.lump_info[num].size
+}
+
+pub(crate) fn cache_lump_num(state: &mut State, num: usize) -> &[u8] {
+    if state.lump_cache[num].is_empty() {
+        let len = lump_length(state, num);
+        let lump = &mut state.lump_cache[num];
+        lump.resize(len, 0);
+        read_lump(state.lump_info[num].clone(), lump);
+    }
+
+    &state.lump_cache[num]
+}
+
+fn read_lump(info: LumpInfo, lump: &mut [u8]) {
+    info.handle
+        .borrow_mut()
+        .seek(SeekFrom::Start(info.position.try_into().unwrap()))
+        .unwrap();
+    info.handle.borrow_mut().read_exact(lump).unwrap();
+}
+
+pub(crate) fn cache_lump_name(state: &mut State, name: impl AsRef<str>) -> &[u8] {
+    let num = get_num_for_name(state, name);
+    cache_lump_num(state, num)
 }

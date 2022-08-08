@@ -318,9 +318,11 @@ fn main() {
                         &vertex_buffer,
                         &indices,
                         &program,
-                        &uniform! { tex: tex.sampled()
-                        .magnify_filter(MagnifySamplerFilter::Nearest)
-                        .minify_filter(MinifySamplerFilter::Nearest) },
+                        &uniform! {
+                            tex: tex.sampled()
+                                .magnify_filter(MagnifySamplerFilter::Nearest)
+                                .minify_filter(MinifySamplerFilter::Nearest)
+                        },
                         &DrawParameters::default(),
                     )
                     .unwrap();
