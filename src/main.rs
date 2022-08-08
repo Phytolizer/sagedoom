@@ -86,35 +86,15 @@ fn main() {
     state.fast = parm_exists(&state.args, "-fast");
     state.dev_parm = parm_exists(&state.args, "-devparm");
 
-    match state.game_mode {
-        GameMode::Retail => {
-            print_centered(
-                state.terminal_size,
-                format!("The Ultimate DOOM Startup v{VERSION}"),
-            );
-        }
-        GameMode::Shareware => {
-            print_centered(
-                state.terminal_size,
-                format!("DOOM Shareware Startup v{VERSION}"),
-            );
-        }
-        GameMode::Registered => {
-            print_centered(
-                state.terminal_size,
-                format!("DOOM Registered Startup v{VERSION}"),
-            );
-        }
-        GameMode::Commercial => {
-            print_centered(
-                state.terminal_size,
-                format!("DOOM 2: Hell on Earth v{VERSION}"),
-            );
-        }
-        GameMode::Undetermined => {
-            print_centered(state.terminal_size, format!("Public DOOM - v{VERSION}"));
-        }
-    }
+    let title = match state.game_mode {
+        GameMode::Retail => format!("The Ultimate DOOM Startup v{VERSION}"),
+        GameMode::Shareware => format!("DOOM Shareware Startup v{VERSION}"),
+        GameMode::Registered => format!("DOOM Registered Startup v{VERSION}"),
+        GameMode::Commercial => format!("DOOM 2: Hell on Earth v{VERSION}"),
+        GameMode::Undetermined => format!("Public DOOM - v{VERSION}"),
+    };
+
+    print_centered(state.terminal_size, title);
 
     if state.dev_parm {
         println!("Development mode ON.");
