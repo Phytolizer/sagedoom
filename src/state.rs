@@ -18,6 +18,10 @@ pub(crate) struct State {
     pub(crate) terminal_size: (u16, u16),
     pub(crate) args: Vec<String>,
     pub(crate) modified_game: bool,
+    pub(crate) no_monsters: bool,
+    pub(crate) respawn: bool,
+    pub(crate) fast: bool,
+    pub(crate) dev_parm: bool,
 }
 
 impl State {
@@ -28,6 +32,10 @@ impl State {
             terminal_size: terminal::size().unwrap_or((1, 1)),
             args: env::args().collect(),
             modified_game: false,
+            no_monsters: false,
+            respawn: false,
+            fast: false,
+            dev_parm: false,
         }
     }
 }

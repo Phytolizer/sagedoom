@@ -5,6 +5,7 @@ use std::env;
 use std::path::PathBuf;
 
 use args::check_parm;
+use args::parm_exists;
 use const_format::concatcp;
 use state::GameMode;
 use state::State;
@@ -80,6 +81,11 @@ fn main() {
     let mut wad_files = Vec::new();
     identify_version(&mut state.game_mode, &mut wad_files);
 
+    state.no_monsters = parm_exists(&state.args, "-nomonsters");
+    state.respawn = parm_exists(&state.args, "-respawn");
+    state.fast = parm_exists(&state.args, "-fast");
+    state.dev_parm = parm_exists(&state.args, "-devparm");
+
     match state.game_mode {
         GameMode::Retail => {
             print_centered(
@@ -108,6 +114,10 @@ fn main() {
         GameMode::Undetermined => {
             print_centered(state.terminal_size, format!("Public DOOM - v{VERSION}"));
         }
+    }
+
+    if state.dev_parm {
+        println!("Development mode ON.");
     }
 
     if let Some(mut p) = check_parm(&state.args, "-file") {
