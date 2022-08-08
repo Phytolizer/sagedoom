@@ -14,6 +14,8 @@ use glium::implement_vertex;
 use glium::index::IndexBuffer;
 use glium::texture::MipmapsOption;
 use glium::uniform;
+use glium::uniforms::MagnifySamplerFilter;
+use glium::uniforms::MinifySamplerFilter;
 use glium::Display;
 use glium::DrawParameters;
 use glium::Program;
@@ -316,7 +318,9 @@ fn main() {
                         &vertex_buffer,
                         &indices,
                         &program,
-                        &uniform! { tex: &tex },
+                        &uniform! { tex: tex.sampled()
+                        .magnify_filter(MagnifySamplerFilter::Nearest)
+                        .minify_filter(MinifySamplerFilter::Nearest) },
                         &DrawParameters::default(),
                     )
                     .unwrap();
