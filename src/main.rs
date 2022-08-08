@@ -4,10 +4,12 @@
 use std::env;
 use std::path::PathBuf;
 
+use args::check_parm;
 use const_format::concatcp;
 use state::GameMode;
 use state::State;
 
+mod args;
 mod state;
 mod wad;
 
@@ -48,9 +50,28 @@ fn identify_version(game_mode: &mut GameMode, wad_files: &mut Vec<PathBuf>) {
     }
 }
 
-fn print_centered(terminal_size: (u16, u16), text: String) {
+fn print_centered(terminal_size: (u16, u16), text: impl AsRef<str>) {
     let (width, _) = terminal_size;
+    let text = text.as_ref();
     println!("{:^width$}", text, width = width.try_into().unwrap());
+}
+
+fn print_centered_fill(terminal_size: (u16, u16), text: impl AsRef<str>, fill: char) {
+    let (width, _) = terminal_size;
+    let width = width as usize;
+    let text = text.as_ref();
+    let pad_left = (width - text.len()) / 2;
+    let pad_right = width - text.len() - pad_left;
+    let fill_left = (0..pad_left).map(|_| fill).collect::<String>();
+    let fill_right = (0..pad_right).map(|_| fill).collect::<String>();
+    println!(
+        "{:>pad_left$}{}{:<pad_right$}",
+        fill_left,
+        text,
+        fill_right,
+        pad_left = pad_left.try_into().unwrap(),
+        pad_right = pad_right.try_into().unwrap()
+    );
 }
 
 fn main() {
@@ -89,5 +110,69 @@ fn main() {
         }
     }
 
+    if let Some(mut p) = check_parm(&state.args, "-file") {
+        state.modified_game = true;
+        p += 1;
+        while p < state.args.len() && !state.args[p].starts_with('-') {
+            wad_files.push(PathBuf::from(&state.args[p]));
+            p += 1;
+        }
+    }
+
     wad::init(&mut state.wad, &wad_files);
+
+    if state.modified_game {
+        const NAMES: &[&str] = &[
+            "e2m1", "e2m2", "e2m3", "e2m4", "e2m5", "e2m6", "e2m7", "e2m8", "e2m9", "e3m1", "e3m2",
+            "e3m3", "e3m4", "e3m5", "e3m6", "e3m7", "e3m8", "e3m9", "dphoof", "bfgga0", "heada1",
+            "cybra1", "spida1d1",
+        ];
+        if state.game_mode == GameMode::Shareware {
+            panic!("You cannot -file with the shareware version. Register!");
+        }
+
+        if state.game_mode == GameMode::Registered {
+            if !NAMES
+                .iter()
+                .all(|n| wad::check_num_for_name(&state.wad, n).is_some())
+            {
+                panic!("This is not the registered version.");
+            }
+        }
+
+        print_centered_fill(state.terminal_size, "", '=');
+        print_centered(
+            state.terminal_size,
+            "ATTENTION:  This version of DOOM has been modified.  If you would like to",
+        );
+        print_centered(
+            state.terminal_size,
+            "get a copy of the original game, call 1-800-IDGAMES or see the readme file.",
+        );
+        print_centered(
+            state.terminal_size,
+            "You will not receive technical support for modified games.",
+        );
+        print_centered_fill(state.terminal_size, "", '=');
+    }
+
+    match state.game_mode {
+        GameMode::Shareware | GameMode::Undetermined => {
+            print_centered_fill(state.terminal_size, "", '=');
+            print_centered(state.terminal_size, "Shareware!");
+            print_centered_fill(state.terminal_size, "", '=');
+        }
+        GameMode::Registered | GameMode::Retail | GameMode::Commercial => {
+            print_centered_fill(state.terminal_size, "", '=');
+            print_centered(
+                state.terminal_size,
+                "Commercial product - do not distribute!",
+            );
+            print_centered(
+                state.terminal_size,
+                "Please report software piracy to the SPA: 1-800-388-PIR8",
+            );
+            print_centered_fill(state.terminal_size, "", '=');
+        }
+    }
 }

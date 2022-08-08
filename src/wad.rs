@@ -62,7 +62,7 @@ fn add_file(state: &mut State, filename: impl AsRef<Path>) {
     let mut handle = match File::open(filename) {
         Ok(handle) => handle,
         Err(_) => {
-            println!("couldn't open {}", filename.display());
+            println!(" couldn't open {}", filename.display());
             return;
         }
     };
@@ -145,4 +145,15 @@ fn add_file(state: &mut State, filename: impl AsRef<Path>) {
         lump.position = info.file_pos.try_into().unwrap();
         lump.size = info.size.try_into().unwrap();
     }
+}
+
+pub(crate) fn check_num_for_name(state: &State, name: impl AsRef<str>) -> Option<usize> {
+    let name = name.as_ref();
+
+    for (i, lump) in state.lump_info.iter().enumerate() {
+        if lump.name.eq_ignore_ascii_case(name) {
+            return Some(i);
+        }
+    }
+    None
 }
