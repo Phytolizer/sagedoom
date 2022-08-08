@@ -36,6 +36,8 @@ use winit::window::WindowBuilder;
 mod args;
 mod screen;
 mod state;
+mod status_bar;
+mod video;
 mod wad;
 
 const VERSION_MAJOR: usize = 1;
@@ -202,6 +204,9 @@ fn main() {
             print_centered_fill(state.terminal_size, "", '=');
         }
     }
+
+    println!("ST_Init: Init status bar.");
+    status_bar::init(&mut state);
 
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().with_fullscreen(Some(Fullscreen::Borderless(None)));

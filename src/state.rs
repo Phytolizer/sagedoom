@@ -16,6 +16,7 @@ pub(crate) enum GameMode {
 #[derive(Debug)]
 pub(crate) struct State {
     pub(crate) wad: crate::wad::State,
+    pub(crate) status_bar: crate::status_bar::State,
     pub(crate) game_mode: GameMode,
     pub(crate) terminal_size: (u16, u16),
     pub(crate) args: Vec<String>,
@@ -33,6 +34,7 @@ impl State {
     pub(crate) fn new() -> Self {
         Self {
             wad: crate::wad::State::new(),
+            status_bar: crate::status_bar::State::new(),
             game_mode: GameMode::Undetermined,
             terminal_size: terminal::size().unwrap_or((1, 1)),
             args: env::args().collect(),
