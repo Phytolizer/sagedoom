@@ -2,6 +2,8 @@ use std::env;
 
 use crossterm::terminal;
 
+use crate::screen::Screen;
+
 #[derive(Debug, PartialEq)]
 pub(crate) enum GameMode {
     Commercial,
@@ -24,6 +26,7 @@ pub(crate) struct State {
     pub(crate) dev_parm: bool,
     pub(crate) forward_move: [isize; 2],
     pub(crate) side_move: [isize; 2],
+    pub(crate) screens: [Screen; 1],
 }
 
 impl State {
@@ -40,6 +43,7 @@ impl State {
             dev_parm: false,
             forward_move: [0x19, 0x32],
             side_move: [0x18, 0x28],
+            screens: [Screen::new(); 1],
         }
     }
 }

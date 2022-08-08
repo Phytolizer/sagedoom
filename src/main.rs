@@ -3,14 +3,35 @@
 
 use std::env;
 use std::path::PathBuf;
+use std::time::Duration;
+use std::time::Instant;
 
 use args::check_parm;
 use args::parm_exists;
 use const_format::concatcp;
+use glium::glutin::ContextBuilder;
+use glium::implement_vertex;
+use glium::index::IndexBuffer;
+use glium::texture::MipmapsOption;
+use glium::uniform;
+use glium::Display;
+use glium::Program;
+use glium::Surface;
+use glium::Texture2d;
+use glium::VertexBuffer;
+use screen::SCREENHEIGHT;
+use screen::SCREENWIDTH;
 use state::GameMode;
 use state::State;
+use winit::event::Event;
+use winit::event::StartCause;
+use winit::event::WindowEvent;
+use winit::event_loop::EventLoop;
+use winit::window::Fullscreen;
+use winit::window::WindowBuilder;
 
 mod args;
+mod screen;
 mod state;
 mod wad;
 
@@ -178,4 +199,121 @@ fn main() {
             print_centered_fill(state.terminal_size, "", '=');
         }
     }
+
+    let event_loop = EventLoop::new();
+    let window = WindowBuilder::new().with_fullscreen(Some(Fullscreen::Borderless(None)));
+    let cb = ContextBuilder::new();
+    let display = Display::new(window, cb, &event_loop).unwrap();
+
+    #[derive(Clone, Copy)]
+    struct Vertex {
+        position: [f32; 2],
+    }
+
+    implement_vertex!(Vertex, position);
+
+    // Rectangle covering whole screen
+    let shape = vec![
+        Vertex {
+            position: [-1.0, -1.0],
+        },
+        Vertex {
+            position: [1.0, -1.0],
+        },
+        Vertex {
+            position: [1.0, 1.0],
+        },
+        Vertex {
+            position: [-1.0, 1.0],
+        },
+    ];
+    let vertex_buffer = VertexBuffer::new(&display, &shape).unwrap();
+    let indices = IndexBuffer::new(
+        &display,
+        glium::index::PrimitiveType::TrianglesList,
+        &[0u16, 1, 2, 0, 2, 3],
+    )
+    .unwrap();
+    let tex = Texture2d::empty_with_mipmaps(
+        &display,
+        MipmapsOption::NoMipmap,
+        SCREENWIDTH as u32,
+        SCREENHEIGHT as u32,
+    )
+    .unwrap();
+
+    const VERTEX_SRC: &str = "
+        #version 330 core
+        in vec2 position;
+
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    ";
+
+    // draw a texture over the whole screen
+    const FRAGMENT_SRC: &str = "
+        #version 330 core
+        out vec4 color;
+        uniform sampler2D tex;
+        void main() {
+            color = texture(tex, gl_FragCoord.xy);
+        }
+    ";
+
+    let program = Program::from_source(&display, VERTEX_SRC, FRAGMENT_SRC, None).unwrap();
+
+    for x in 0..SCREENWIDTH {
+        for y in 0..SCREENHEIGHT {
+            let u = x as f32 / SCREENWIDTH as f32 * 255.999;
+            let v = y as f32 / SCREENHEIGHT as f32 * 255.999;
+            state.screens[0].draw(x, y, [u as u8, v as u8, 255]);
+        }
+    }
+
+    event_loop.run(move |event, _, control_flow| {
+        const FPS: usize = 35;
+        const FRAME_TIME: f64 = 1.0 / FPS as f64;
+        const FRAME_TIME_NS: u64 = (FRAME_TIME * 1_000_000_000.0) as u64;
+        let next_frame_time = Instant::now() + Duration::from_nanos(FRAME_TIME_NS);
+        control_flow.set_wait_until(next_frame_time);
+        match event {
+            Event::WindowEvent {
+                event: WindowEvent::CloseRequested,
+                ..
+            } => {
+                control_flow.set_exit();
+                return;
+            }
+            Event::NewEvents(cause) => match cause {
+                StartCause::ResumeTimeReached { .. } => {}
+                StartCause::Init => {}
+                _ => return,
+            },
+            Event::MainEventsCleared => {
+                tex.write(
+                    glium::Rect {
+                        left: 0,
+                        bottom: 0,
+                        width: SCREENWIDTH as u32,
+                        height: SCREENHEIGHT as u32,
+                    },
+                    &state.screens[0],
+                );
+                let mut target = display.draw();
+                target
+                    .draw(
+                        &vertex_buffer,
+                        &indices,
+                        &program,
+                        &uniform! { tex: &tex },
+                        &Default::default(),
+                    )
+                    .unwrap();
+                target.finish().unwrap();
+            }
+            Event::RedrawRequested(_) => {}
+            _ => {}
+        }
+    })
 }
