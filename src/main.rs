@@ -5,11 +5,16 @@ use std::env;
 use std::path::Path;
 use std::path::PathBuf;
 
+use const_format::concatcp;
 use state::GameMode;
 use state::State;
 
 mod state;
 mod wad;
+
+const VERSION_MAJOR: usize = 1;
+const VERSION_MINOR: usize = 10;
+const VERSION: &str = concatcp!(VERSION_MAJOR, ".", VERSION_MINOR);
 
 fn add_file(state: &mut State, file: impl AsRef<Path>) {
     let file = file.as_ref();
@@ -63,23 +68,29 @@ fn main() {
         GameMode::Retail => {
             print_centered(
                 state.terminal_size,
-                format!("The Ultimate DOOM Startup v1.10"),
+                format!("The Ultimate DOOM Startup v{VERSION}"),
             );
         }
         GameMode::Shareware => {
-            print_centered(state.terminal_size, format!("DOOM Shareware Startup v1.10"));
+            print_centered(
+                state.terminal_size,
+                format!("DOOM Shareware Startup v{VERSION}"),
+            );
         }
         GameMode::Registered => {
             print_centered(
                 state.terminal_size,
-                format!("DOOM Registered Startup v1.10"),
+                format!("DOOM Registered Startup v{VERSION}"),
             );
         }
         GameMode::Commercial => {
-            print_centered(state.terminal_size, format!("DOOM 2: Hell on Earth v1.10"));
+            print_centered(
+                state.terminal_size,
+                format!("DOOM 2: Hell on Earth v{VERSION}"),
+            );
         }
         GameMode::Undetermined => {
-            print_centered(state.terminal_size, format!("Public DOOM - v1.10"));
+            print_centered(state.terminal_size, format!("Public DOOM - v{VERSION}"));
         }
     }
 
