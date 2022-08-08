@@ -49,8 +49,8 @@ fn identify_version(state: &mut State) {
     }
 }
 
-fn print_centered(state: &State, text: String) {
-    let (width, _) = state.terminal_size;
+fn print_centered(terminal_size: (u16, u16), text: String) {
+    let (width, _) = terminal_size;
     println!("{:^width$}", text, width = width.try_into().unwrap());
 }
 
@@ -61,22 +61,27 @@ fn main() {
 
     match state.game_mode {
         GameMode::Retail => {
-            print_centered(&state, format!("The Ultimate DOOM Startup v1.10"));
+            print_centered(
+                state.terminal_size,
+                format!("The Ultimate DOOM Startup v1.10"),
+            );
         }
         GameMode::Shareware => {
-            print_centered(&state, format!("DOOM Shareware Startup v1.10"));
+            print_centered(state.terminal_size, format!("DOOM Shareware Startup v1.10"));
         }
         GameMode::Registered => {
-            print_centered(&state, format!("DOOM Registered Startup v1.10"));
+            print_centered(
+                state.terminal_size,
+                format!("DOOM Registered Startup v1.10"),
+            );
         }
         GameMode::Commercial => {
-            print_centered(&state, format!("DOOM 2: Hell on Earth v1.10"));
+            print_centered(state.terminal_size, format!("DOOM 2: Hell on Earth v1.10"));
         }
         GameMode::Undetermined => {
-            print_centered(&state, format!("Public DOOM - v1.10"));
+            print_centered(state.terminal_size, format!("Public DOOM - v1.10"));
         }
     }
 
-    let wad_files = state.wad_files.clone();
-    wad::init(&mut state, wad_files);
+    wad::init(&mut state.wad, &state.wad_files);
 }

@@ -46,19 +46,19 @@ impl State {
     }
 }
 
-pub(crate) fn init(state: &mut crate::state::State, filenames: impl AsRef<[PathBuf]>) {
+pub(crate) fn init(state: &mut State, filenames: impl AsRef<[PathBuf]>) {
     for filename in filenames.as_ref().iter() {
         add_file(state, filename);
     }
 
-    if state.wad.num_lumps == 0 {
+    if state.num_lumps == 0 {
         panic!("no files found");
     }
 
-    state.wad.lump_cache.resize(state.wad.num_lumps, Vec::new());
+    state.lump_cache.resize(state.num_lumps, Vec::new());
 }
 
-fn add_file(state: &mut crate::state::State, filename: impl AsRef<Path>) {
+fn add_file(state: &mut State, filename: impl AsRef<Path>) {
     let filename = filename.as_ref();
     let mut handle = match File::open(filename) {
         Ok(handle) => handle,
@@ -68,7 +68,7 @@ fn add_file(state: &mut crate::state::State, filename: impl AsRef<Path>) {
         }
     };
     println!(" adding {}", filename.display());
-    let start_lump = state.wad.num_lumps;
+    let start_lump = state.num_lumps;
     let file_info = if filename
         .extension()
         .map(|e| e.to_str())
@@ -110,7 +110,7 @@ fn add_file(state: &mut crate::state::State, filename: impl AsRef<Path>) {
                 name,
             });
         }
-        state.wad.num_lumps += num_lumps;
+        state.num_lumps += num_lumps;
         file_info
     } else {
         let file_info = vec![FileLump {
@@ -124,23 +124,23 @@ fn add_file(state: &mut crate::state::State, filename: impl AsRef<Path>) {
                 .try_into()
                 .unwrap(),
         }];
-        state.wad.num_lumps += 1;
+        state.num_lumps += 1;
         file_info
     };
 
-    state.wad.lump_info.extend(
+    state.lump_info.extend(
         std::iter::repeat(LumpInfo {
             name: String::new(),
             handle: Rc::new(handle),
             position: 0,
             size: 0,
         })
-        .take(state.wad.num_lumps - start_lump),
+        .take(state.num_lumps - start_lump),
     );
 
     for (info, lump) in file_info
         .into_iter()
-        .zip(state.wad.lump_info.iter_mut().skip(start_lump))
+        .zip(state.lump_info.iter_mut().skip(start_lump))
     {
         let name_end = info.name.iter().position(|c| *c == 0).unwrap_or(8);
         lump.name = String::from_utf8_lossy(&info.name[0..name_end]).to_string();
