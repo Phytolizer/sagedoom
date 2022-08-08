@@ -15,6 +15,7 @@ use glium::index::IndexBuffer;
 use glium::texture::MipmapsOption;
 use glium::uniform;
 use glium::Display;
+use glium::DrawParameters;
 use glium::Program;
 use glium::Surface;
 use glium::Texture2d;
@@ -208,23 +209,28 @@ fn main() {
     #[derive(Clone, Copy)]
     struct Vertex {
         position: [f32; 2],
+        tex_coord: [f32; 2],
     }
 
-    implement_vertex!(Vertex, position);
+    implement_vertex!(Vertex, position, tex_coord);
 
     // Rectangle covering whole screen
     let shape = vec![
         Vertex {
             position: [-1.0, -1.0],
+            tex_coord: [0.0, 0.0],
         },
         Vertex {
             position: [1.0, -1.0],
+            tex_coord: [1.0, 0.0],
         },
         Vertex {
             position: [1.0, 1.0],
+            tex_coord: [1.0, 1.0],
         },
         Vertex {
             position: [-1.0, 1.0],
+            tex_coord: [0.0, 1.0],
         },
     ];
     let vertex_buffer = VertexBuffer::new(&display, &shape).unwrap();
@@ -245,19 +251,24 @@ fn main() {
     const VERTEX_SRC: &str = "
         #version 330 core
         in vec2 position;
+        in vec2 tex_coord;
+
+        out vec2 pass_tex_coord;
 
         void main() {
             gl_Position = vec4(position, 0.0, 1.0);
+            pass_tex_coord = tex_coord;
         }
     ";
 
     // draw a texture over the whole screen
     const FRAGMENT_SRC: &str = "
         #version 330 core
+        in vec2 pass_tex_coord;
         out vec4 color;
         uniform sampler2D tex;
         void main() {
-            color = texture(tex, gl_FragCoord.xy);
+            color = texture(tex, pass_tex_coord);
         }
     ";
 
@@ -306,7 +317,7 @@ fn main() {
                         &indices,
                         &program,
                         &uniform! { tex: &tex },
-                        &Default::default(),
+                        &DrawParameters::default(),
                     )
                     .unwrap();
                 target.finish().unwrap();
