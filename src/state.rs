@@ -22,6 +22,8 @@ pub(crate) struct State {
     pub(crate) respawn: bool,
     pub(crate) fast: bool,
     pub(crate) dev_parm: bool,
+    pub(crate) forward_move: [isize; 2],
+    pub(crate) side_move: [isize; 2],
 }
 
 impl State {
@@ -36,6 +38,8 @@ impl State {
             respawn: false,
             fast: false,
             dev_parm: false,
+            forward_move: [0x19, 0x32],
+            side_move: [0x18, 0x28],
         }
     }
 }

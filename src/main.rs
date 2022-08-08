@@ -120,6 +120,19 @@ fn main() {
         println!("Development mode ON.");
     }
 
+    if let Some(p) = check_parm(&state.args, "-turbo") {
+        let scale = if p < state.args.len() - 1 {
+            state.args[p + 1].parse::<isize>().unwrap().clamp(10, 400)
+        } else {
+            200
+        };
+        println!("turbo scale: {scale}%");
+        state.forward_move[0] = state.forward_move[0] * scale / 100;
+        state.forward_move[1] = state.forward_move[1] * scale / 100;
+        state.side_move[0] = state.side_move[0] * scale / 100;
+        state.side_move[1] = state.side_move[1] * scale / 100;
+    }
+
     if let Some(mut p) = check_parm(&state.args, "-file") {
         state.modified_game = true;
         p += 1;
