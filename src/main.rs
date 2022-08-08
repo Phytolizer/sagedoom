@@ -2,7 +2,6 @@
 #![feature(box_syntax)]
 
 use std::env;
-use std::path::Path;
 use std::path::PathBuf;
 
 use const_format::concatcp;
@@ -16,12 +15,7 @@ const VERSION_MAJOR: usize = 1;
 const VERSION_MINOR: usize = 10;
 const VERSION: &str = concatcp!(VERSION_MAJOR, ".", VERSION_MINOR);
 
-fn add_file(state: &mut State, file: impl AsRef<Path>) {
-    let file = file.as_ref();
-    state.wad_files.push(file.to_path_buf());
-}
-
-fn identify_version(state: &mut State) {
+fn identify_version(game_mode: &mut GameMode, wad_files: &mut Vec<PathBuf>) {
     let doom_wad_dir = PathBuf::from(env::var("DOOMWADDIR").unwrap_or_else(|_| ".".to_string()));
     let doom2_wad = doom_wad_dir.join("doom2.wad");
     let doomu_wad = doom_wad_dir.join("doomu.wad");
@@ -31,26 +25,26 @@ fn identify_version(state: &mut State) {
     let tnt_wad = doom_wad_dir.join("tnt.wad");
 
     if doom2_wad.exists() {
-        state.game_mode = GameMode::Commercial;
-        add_file(state, &doom2_wad);
+        *game_mode = GameMode::Commercial;
+        wad_files.push(doom2_wad);
     } else if plutonia_wad.exists() {
-        state.game_mode = GameMode::Commercial;
-        add_file(state, &plutonia_wad);
+        *game_mode = GameMode::Commercial;
+        wad_files.push(plutonia_wad);
     } else if doomu_wad.exists() {
-        state.game_mode = GameMode::Retail;
-        add_file(state, &doomu_wad);
+        *game_mode = GameMode::Retail;
+        wad_files.push(doomu_wad);
     } else if doom_wad.exists() {
-        state.game_mode = GameMode::Registered;
-        add_file(state, &doom_wad);
+        *game_mode = GameMode::Registered;
+        wad_files.push(doom_wad);
     } else if doom1_wad.exists() {
-        state.game_mode = GameMode::Shareware;
-        add_file(state, &doom1_wad);
+        *game_mode = GameMode::Shareware;
+        wad_files.push(doom1_wad);
     } else if tnt_wad.exists() {
-        state.game_mode = GameMode::Shareware;
-        add_file(state, &tnt_wad);
+        *game_mode = GameMode::Shareware;
+        wad_files.push(tnt_wad);
     } else {
         println!("Game mode indeterminate.");
-        state.game_mode = GameMode::Undetermined;
+        *game_mode = GameMode::Undetermined;
     }
 }
 
@@ -62,7 +56,8 @@ fn print_centered(terminal_size: (u16, u16), text: String) {
 fn main() {
     let mut state = box State::new();
 
-    identify_version(&mut state);
+    let mut wad_files = Vec::new();
+    identify_version(&mut state.game_mode, &mut wad_files);
 
     match state.game_mode {
         GameMode::Retail => {
@@ -94,5 +89,5 @@ fn main() {
         }
     }
 
-    wad::init(&mut state.wad, &state.wad_files);
+    wad::init(&mut state.wad, &wad_files);
 }

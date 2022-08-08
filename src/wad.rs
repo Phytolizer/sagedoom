@@ -9,7 +9,6 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 pub(crate) struct WadInfo {
-    pub(crate) identification: [u8; 4],
     pub(crate) num_lumps: i32,
     pub(crate) info_table_offset: i32,
 }
@@ -87,7 +86,6 @@ fn add_file(state: &mut State, filename: impl AsRef<Path>) {
         let num_lumps = handle.read_i32::<LittleEndian>().unwrap();
         let info_table_offset = handle.read_i32::<LittleEndian>().unwrap();
         let header = WadInfo {
-            identification,
             num_lumps,
             info_table_offset,
         };
@@ -115,7 +113,7 @@ fn add_file(state: &mut State, filename: impl AsRef<Path>) {
     } else {
         let file_info = vec![FileLump {
             file_pos: 0,
-            size: handle.seek(SeekFrom::End(0)).unwrap() as i32,
+            size: 0,
             name: filename
                 .file_stem()
                 .unwrap()
