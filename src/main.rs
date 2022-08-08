@@ -274,8 +274,7 @@ fn main() {
     event_loop.run(move |event, _, control_flow| {
         const FPS: usize = 35;
         const FRAME_TIME: f64 = 1.0 / FPS as f64;
-        const FRAME_TIME_NS: u64 = (FRAME_TIME * 1_000_000_000.0) as u64;
-        let next_frame_time = Instant::now() + Duration::from_nanos(FRAME_TIME_NS);
+        let next_frame_time = Instant::now() + Duration::from_secs_f64(FRAME_TIME);
         control_flow.set_wait_until(next_frame_time);
         match event {
             Event::WindowEvent {
