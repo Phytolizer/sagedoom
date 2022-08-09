@@ -330,6 +330,7 @@ fn determine_shape(inner_size: PhysicalSize<u32>) -> Vec<Vertex> {
     let (width, height) = (SCREENWIDTH as f32 * scale, SCREENHEIGHT as f32 * scale);
     let offset_x = (inner_size.width as f32 - width) / 2.0;
     let offset_y = (inner_size.height as f32 - height) / 2.0;
+    // now scale back to OpenGL coordinates
     let offset_x_scaled = offset_x / inner_size.width as f32 * 2.0;
     let offset_y_scaled = offset_y / inner_size.height as f32 * 2.0;
     let max_x = 1.0 - offset_x_scaled;
