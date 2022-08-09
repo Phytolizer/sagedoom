@@ -300,6 +300,7 @@ fn main() {
                     },
                     &state.screens[0],
                 );
+                status_bar::drawer(&mut state);
                 let mut target = display.draw();
                 target
                     .draw(
