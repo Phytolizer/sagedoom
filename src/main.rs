@@ -26,6 +26,7 @@ use screen::SCREENHEIGHT;
 use screen::SCREENWIDTH;
 use state::GameMode;
 use state::State;
+use winit::dpi::PhysicalSize;
 use winit::event::Event;
 use winit::event::StartCause;
 use winit::event::WindowEvent;
@@ -43,6 +44,12 @@ mod wad;
 const VERSION_MAJOR: usize = 1;
 const VERSION_MINOR: usize = 10;
 const VERSION: &str = concatcp!(VERSION_MAJOR, ".", VERSION_MINOR);
+
+#[derive(Clone, Copy)]
+struct Vertex {
+    position: [f32; 2],
+    tex_coord: [f32; 2],
+}
 
 fn identify_version(game_mode: &mut GameMode, wad_files: &mut Vec<PathBuf>) {
     let doom_wad_dir = PathBuf::from(env::var("DOOMWADDIR").unwrap_or_else(|_| ".".to_string()));
@@ -209,37 +216,13 @@ fn main() {
     status_bar::init(&mut state);
 
     let event_loop = EventLoop::new();
-    let window = WindowBuilder::new().with_fullscreen(Some(Fullscreen::Borderless(None)));
+    let wb = WindowBuilder::new().with_fullscreen(Some(Fullscreen::Borderless(None)));
     let cb = ContextBuilder::new();
-    let display = Display::new(window, cb, &event_loop).unwrap();
-
-    #[derive(Clone, Copy)]
-    struct Vertex {
-        position: [f32; 2],
-        tex_coord: [f32; 2],
-    }
+    let display = Display::new(wb, cb, &event_loop).unwrap();
 
     implement_vertex!(Vertex, position, tex_coord);
 
-    // Rectangle covering whole screen
-    let shape = vec![
-        Vertex {
-            position: [-1.0, -1.0],
-            tex_coord: [0.0, 0.0],
-        },
-        Vertex {
-            position: [1.0, -1.0],
-            tex_coord: [1.0, 0.0],
-        },
-        Vertex {
-            position: [1.0, 1.0],
-            tex_coord: [1.0, 1.0],
-        },
-        Vertex {
-            position: [-1.0, 1.0],
-            tex_coord: [0.0, 1.0],
-        },
-    ];
+    let shape = determine_shape(display.gl_window().window().inner_size());
     let vertex_buffer = VertexBuffer::new(&display, &shape).unwrap();
     let indices = IndexBuffer::new(
         &display,
@@ -337,4 +320,37 @@ fn main() {
             _ => {}
         }
     })
+}
+
+fn determine_shape(inner_size: PhysicalSize<u32>) -> Vec<Vertex> {
+    // scale SCREENWIDTH*SCREENHEIGHT rect to fit within inner_size
+    let vert_scale = inner_size.width as f32 / SCREENWIDTH as f32;
+    let horiz_scale = inner_size.height as f32 / SCREENHEIGHT as f32;
+    let scale = vert_scale.min(horiz_scale);
+    let (width, height) = (SCREENWIDTH as f32 * scale, SCREENHEIGHT as f32 * scale);
+    let offset_x = (inner_size.width as f32 - width) / 2.0;
+    let offset_y = (inner_size.height as f32 - height) / 2.0;
+    let offset_x_scaled = offset_x / inner_size.width as f32 * 2.0;
+    let offset_y_scaled = offset_y / inner_size.height as f32 * 2.0;
+    let max_x = 1.0 - offset_x_scaled;
+    let max_y = 1.0 - offset_y_scaled;
+
+    vec![
+        Vertex {
+            position: [-max_x, -max_y],
+            tex_coord: [0.0, 0.0],
+        },
+        Vertex {
+            position: [max_x, -max_y],
+            tex_coord: [1.0, 0.0],
+        },
+        Vertex {
+            position: [max_x, max_y],
+            tex_coord: [1.0, 1.0],
+        },
+        Vertex {
+            position: [-max_x, max_y],
+            tex_coord: [0.0, 1.0],
+        },
+    ]
 }
